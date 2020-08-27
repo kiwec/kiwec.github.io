@@ -32,7 +32,7 @@
             </h5>
                 </header>
                 <p>As you should know, Node.JS's <code>Math.random()</code> is not cryptographically random and, as such, you can in theory predict future values if you have previous values.</p>
-<p>While there have been articles aimed at cracking <code>Math.random()</code> before, they are aimed at browsers, and have not been tried on real-world scenarios. Many websites use Node.JS for their backend, and few suspect <code>Math.random()</code> from, well, not being random.</p>
+<p>While there have been articles aimed at cracking <code>Math.random()</code> before, they are aimed at browsers, and have not been tried on real-world scenarios. Many websites use Node.JS for their backend, and few suspect <code>Math.random()</code> of, well, not being random.</p>
 <h2>The victim</h2>
 <p>We are looking at a website proudly developed in TypeScript, which provides a point system with a few gambling games to limit inflation. The one where you can win the most in one move is the roulette, where you pick a number between 1 and 10 and if you win, you get 10x what you put in. The house doesn't actually have an edge here, but since the minimal bet is pretty expensive, most just empty their balance again and again.</p>
 <h2>Discovery</h2>
@@ -114,7 +114,7 @@
 
 
 <p>It took us a few second to crack a seed from v12's PRNG, but this will take a few minutes on v10. But since we only need to crack the seed once to be able to simulate <code>Math.random()</code> many, many times, we don't have to look for optimizations - let's try it for real!</p>
-<p><img alt="Victory." src="/static/victory.png"></p>
+<p><img alt="Victory." src="/blog/victory.png"></p>
 <p>Wow, how lucky, we won on our first try! Try not to win every time from now on ;)</p>
 <h2>Conclusion</h2>
 <p>This should be obvious, but don't use <code>Math.random()</code> for anything that you don't want the user to guess. Use Node.JS's <a href="https://nodejs.org/api/crypto.html#crypto_crypto_randombytes_size_callback">crypto module</a>, which generates cryptographically secure bytes.</p>
