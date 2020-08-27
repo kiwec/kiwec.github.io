@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width" />
+        <title>Beating the odds with Z3 - kiwec's blog</title>
+        <meta name="author" content="kiwec" />
+        <meta name="keywords" content="kiwec,blog,python,z3" />
+        <link rel="stylesheet" href="https://kiwec.net/blog/style.css" />
+        <link rel="alternate" type="application/rss+xml" href="https://kiwec.net/blog/rss.xml">
+    </head>
+    <body>
+        <header>
+            <nav>
+                <h5>
+                    <a href="https://kiwec.net/blog/">blog</a> |
+                    <a href="https://github.com/kiwec/">github</a> |
+                    <a href="https://git.sr.ht/~kiwec/">sourcehut</a>
+                </h5>
+            </nav>
+        </header>
+        <main>
+            
+            <article>
+                <header>
+                    <h1>Beating the odds with Z3</h1>
+                    
+                    <h5><a href="https://kiwec.net/blog/tags/python">#python</a>, <a href="https://kiwec.net/blog/tags/z3">#z3</a> - 
+            <time datetime="2020-08-27T09:37:24">
+                August 08, 2020
+            </time>
+            </h5>
+                </header>
+                <p>As you should know, Node.JS's <code>Math.random()</code> is not cryptographically random and, as such, you can in theory predict future values if you have previous values.</p>
+<p>While there have been articles aimed at cracking <code>Math.random()</code> before, they are aimed at browsers, and have not been tried on real-world scenarios. Many websites use Node.JS for their backend, and few suspect <code>Math.random()</code> from, well, not being random.</p>
+<h2>The victim</h2>
+<p>We are looking at a website proudly developed in TypeScript, which provides a point system with a few gambling games to limit inflation. The one where you can win the most in one move is the roulette, where you pick a number between 1 and 10 and if you win, you get 10x what you put in. The house doesn't actually have an edge here, but since the minimal bet is pretty expensive, most just empty their balance again and again.</p>
+<h2>Discovery</h2>
+<p>As it turns out, the website is <a href="https://github.com/skychatorg/skychat">open source</a>, so we don't have to imagine what the winning algorithm looks like. There are only a few places where <code>Math.random()</code> is called:</p>
+<ul>
+<li>When using <code>/roll</code>, the command we're trying to exploit</li>
+<li>When using <code>/guess</code>, which is another gambling command</li>
+<li>When uploading a file</li>
+</ul>
+<p>Let's start with <code>/roll</code>.</p>
+<h3>/roll</h3>
+<div class="highlight"><pre><span></span><code><span class="nx">RollPlugin</span><span class="p">.</span><span class="nx">TICK_MS</span> <span class="o">=</span> <span class="nb">Array</span><span class="p">.</span><span class="nx">from</span><span class="p">({</span><span class="nx">length</span><span class="o">:</span> <span class="mi">3000</span> <span class="o">/</span> <span class="mi">150</span><span class="p">})</span>
+    <span class="p">.</span><span class="nx">map</span><span class="p">((</span><span class="nx">_</span><span class="p">,</span> <span class="nx">i</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="nx">i</span><span class="p">)</span> <span class="o">*</span> <span class="mi">150</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">concat</span><span class="p">([</span>
+        <span class="mi">3048</span><span class="p">,</span> <span class="mi">3180</span><span class="p">,</span> <span class="mi">3307</span><span class="p">,</span> <span class="mi">3440</span><span class="p">,</span> <span class="mi">3576</span><span class="p">,</span> <span class="mi">3723</span><span class="p">,</span> <span class="mi">3881</span><span class="p">,</span> <span class="mi">4040</span><span class="p">,</span> <span class="mi">4209</span><span class="p">,</span>
+        <span class="mi">4398</span><span class="p">,</span> <span class="mi">4603</span><span class="p">,</span> <span class="mi">4834</span><span class="p">,</span> <span class="mi">5084</span><span class="p">,</span> <span class="mi">5372</span><span class="p">,</span> <span class="mi">5744</span><span class="p">,</span> <span class="mi">6413</span><span class="p">,</span> <span class="mi">7621</span>
+    <span class="p">]);</span>
+
+<span class="k">this</span><span class="p">.</span><span class="nx">currentGame</span><span class="p">.</span><span class="nx">ballPosition</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">floor</span><span class="p">(</span><span class="nb">Math</span><span class="p">.</span><span class="nx">random</span><span class="p">()</span> <span class="o">*</span> <span class="mi">10</span><span class="p">);</span>
+
+<span class="c1">// Initialize board</span>
+<span class="k">this</span><span class="p">.</span><span class="nx">updateGameMessage</span><span class="p">();</span>
+<span class="k">this</span><span class="p">.</span><span class="nx">room</span><span class="p">.</span><span class="nx">send</span><span class="p">(</span><span class="s1">&#39;roll&#39;</span><span class="p">,</span> <span class="p">{</span> <span class="nx">state</span><span class="o">:</span> <span class="kc">true</span> <span class="p">});</span>
+<span class="nx">await</span> <span class="nx">waitTimeout</span><span class="p">(</span><span class="mi">100</span><span class="p">);</span>
+
+<span class="c1">// The timeout will increase randomly until reaching maxTimeout</span>
+<span class="k">for</span> <span class="p">(</span><span class="kr">const</span> <span class="nx">tickMs</span> <span class="k">of</span> <span class="nx">RollPlugin</span><span class="p">.</span><span class="nx">TICK_MS</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">setTimeout</span><span class="p">(()</span> <span class="p">=&gt;</span> <span class="p">{</span>
+        <span class="c1">// Move ball to next slot</span>
+        <span class="k">this</span><span class="p">.</span><span class="nx">currentGame</span><span class="o">!</span><span class="p">.</span><span class="nx">ballPosition</span> <span class="o">=</span> <span class="p">(</span><span class="o">++</span><span class="k">this</span><span class="p">.</span><span class="nx">currentGame</span><span class="o">!</span><span class="p">.</span><span class="nx">ballPosition</span><span class="p">)</span> <span class="o">%</span> <span class="mi">10</span><span class="p">;</span>
+
+        <span class="c1">// Redraw game</span>
+        <span class="k">this</span><span class="p">.</span><span class="nx">updateGameMessage</span><span class="p">();</span>
+    <span class="p">},</span> <span class="nx">tickMs</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="c1">// Wait for latest tick to complete</span>
+<span class="nx">await</span> <span class="nx">waitTimeout</span><span class="p">(</span><span class="nx">RollPlugin</span><span class="p">.</span><span class="nx">TICK_MS</span><span class="p">[</span><span class="nx">RollPlugin</span><span class="p">.</span><span class="nx">TICK_MS</span><span class="p">.</span><span class="nx">length</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]);</span>
+</code></pre></div>
+
+
+<p>This displays a fancy rolling animation, but we're only interested in the result. The only non-deterministic part here is the initial position of the ball: all this code can be reduced to <code>Math.floor(Math.random() * 10) + 37) % 10</code> (37 being the number of slot updates).</p>
+<p>This sounds very promising, but in order to get the seed of <code>Math.random()</code>, we'll need a lot more bits than that.</p>
+<h3>/guess</h3>
+<p>This command generates a number between 0 and 999, and the player that chose the closest number gets the winnings. While this gives you more bits, it requires other people to be willing to play, and is still not enough to crack <code>Math.random()</code>.</p>
+<h3>File uploading</h3>
+<p>Why would file upload require random numbers, you ask? Maybe the incriminating line will enlighten you:</p>
+<div class="highlight"><pre><span></span><code><span class="kr">const</span> <span class="nx">filePath</span> <span class="o">=</span> <span class="s1">&#39;uploads/&#39;</span>
+    <span class="o">+</span> <span class="nx">date</span><span class="p">.</span><span class="nx">toISOString</span><span class="p">().</span><span class="nx">substr</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">19</span><span class="p">).</span><span class="nx">replace</span><span class="p">(</span><span class="sr">/(-|T)/g</span><span class="p">,</span> <span class="s1">&#39;/&#39;</span><span class="p">).</span><span class="nx">replace</span><span class="p">(</span><span class="sr">/:/g</span><span class="p">,</span> <span class="s1">&#39;-&#39;</span><span class="p">)</span>
+    <span class="o">+</span> <span class="s1">&#39;-&#39;</span> <span class="o">+</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">floor</span><span class="p">(</span><span class="mi">1000000000</span> <span class="o">*</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">random</span><span class="p">())</span> <span class="o">+</span> <span class="s1">&#39;.&#39;</span> <span class="o">+</span> <span class="nx">extension</span><span class="p">;</span>
+</code></pre></div>
+
+
+<p>This sounds really promising. This gives us 23 (out of 52) bits of data, which should be enough to crack the seed with enough inputs.</p>
+<h3>Building the hack</h3>
+<p>We're going to base our work off of <a href="https://github.com/TACIXAT/XorShift128Plus">this XorShift128+ cracker</a>, which is unfortunately in Python 2, and only targets browsers.</p>
+<p><a href="https://github.com/nodejs/node/blob/v12.x/deps/v8/src/base/utils/random-number-generator.h#L111">Node.JS's random number generator</a> is the same as Chrome's, so after a quick 2to3 conversion, it should be usable as is. And it is! However, we only have a small portion of the available bits, so we'll have to adapt it a bit.</p>
+<p>We'll simply replace the <a href="https://github.com/TACIXAT/XorShift128Plus/blob/master/xs128p.py#L43">original simulation</a> of <code>ToDouble()</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="n">impl</span> <span class="o">=</span> <span class="n">Implies</span><span class="p">(</span><span class="n">condition</span><span class="p">,</span> <span class="n">LShR</span><span class="p">(</span><span class="n">sym_state0</span><span class="p">,</span> <span class="mi">12</span><span class="p">)</span> <span class="o">==</span> <span class="n">generated</span><span class="p">)</span>
+</code></pre></div>
+
+
+<p>With one that has to put in more effort:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># We don&#39;t have the 12 bits of the mantissa, and we don&#39;t have the last 29 bits of the fraction component.</span>
+<span class="n">MASK</span> <span class="o">=</span> <span class="mh">0xFFFFFFFFFFFFFFFF</span>
+<span class="n">SKYMASK</span> <span class="o">=</span> <span class="n">MASK</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">MASK</span> <span class="o">&lt;&lt;</span> <span class="mi">29</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">MASK</span> <span class="o">&gt;&gt;</span> <span class="mi">12</span><span class="p">)</span>
+
+<span class="n">impl</span> <span class="o">=</span> <span class="n">Implies</span><span class="p">(</span><span class="n">condition</span><span class="p">,</span> <span class="n">LShR</span><span class="p">(</span><span class="n">sym_state0</span><span class="p">,</span> <span class="mi">12</span><span class="p">)</span> <span class="o">&amp;</span> <span class="n">SKYMASK</span> <span class="o">==</span> <span class="n">generated</span><span class="p">)</span>
+</code></pre></div>
+
+
+<p>Then, we can finally test on a local build of the chat system. After uploading 6 files, and using their filenames, we can successfully crack <code>Math.random()</code>. From there, we are able to guess future filenames, and, excitingly, future winning numbers for the roulette game.</p>
+<h2>Testing it on the real website</h2>
+<p>Things don't always go as smooth as expected. It turns out our method doesn't work at all on the remote website - the generated numbers are completely off, and sometimes the cracker doesn't even find the seed.</p>
+<p>It turns out, Node.JS's number generator changed between versions - and the one we worked on locally is not the same as the server. Whoops. At the time, Node.JS v10 was still in LTS phase, so I chose to update my code to support it. It is also the same as v11's, so as long as the owned isn't running some obscure out-of-date version, we should cover all available versions.</p>
+<p>Take a look at <a href="https://github.com/nodejs/node/blob/v10.x/deps/v8/src/base/utils/random-number-generator.h#L111">the source code</a>. It seems that v10 uses both state variables, while v12 only uses one. I'm not a cryptographer, but it certainly makes cracking v12 faster with our approach. Let's update our code for v10:</p>
+<div class="highlight"><pre><span></span><code><span class="n">impl</span> <span class="o">=</span> <span class="n">Implies</span><span class="p">(</span><span class="n">condition</span><span class="p">,</span> <span class="p">(</span><span class="n">sym_state0</span> <span class="o">+</span> <span class="n">sym_state1</span><span class="p">)</span> <span class="o">&amp;</span> <span class="n">SKYMASK</span> <span class="o">==</span> <span class="n">generated</span><span class="p">)</span>
+</code></pre></div>
+
+
+<p>It took us a few second to crack a seed from v12's PRNG, but this will take a few minutes on v10. But since we only need to crack the seed once to be able to simulate <code>Math.random()</code> many, many times, we don't have to look for optimizations - let's try it for real!</p>
+<p><img alt="Victory." src="/static/victory.png"></p>
+<p>Wow, how lucky, we won on our first try! Try not to win every time from now on ;)</p>
+<h2>Conclusion</h2>
+<p>This should be obvious, but don't use <code>Math.random()</code> for anything that you don't want the user to guess. Use Node.JS's <a href="https://nodejs.org/api/crypto.html#crypto_crypto_randombytes_size_callback">crypto module</a>, which generates cryptographically secure bytes.</p>
+<p>You can read the full source code of the exploit <a href="https://gist.github.com/kiwec/bcd1ea674984bc54584e0b16cb8031e7">in this gist.</a></p>
+            </article>
+            
+        </main>
+        <footer>
+            <a rel="alternate" type="application/rss+xml" href="https://kiwec.net/blog/rss.xml">
+                Subscribe
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                >
+                    <path
+                        d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-12.832 20c-1.197 0-2.168-.969-2.168-2.165s.971-2.165 2.168-2.165 2.167.969 2.167 2.165-.97 2.165-2.167 2.165zm5.18 0c-.041-4.029-3.314-7.298-7.348-7.339v-3.207c5.814.041 10.518 4.739 10.561 10.546h-3.213zm5.441 0c-.021-7.063-5.736-12.761-12.789-12.792v-3.208c8.83.031 15.98 7.179 16 16h-3.211z"
+                    />
+                </svg>
+            </a>
+        </footer>
+    </body>
+</html>

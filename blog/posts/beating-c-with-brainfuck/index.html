@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width" />
+        <title>Beating C with 1 line of Brainfuck - kiwec's blog</title>
+        <meta name="author" content="kiwec" />
+        <meta name="keywords" content="kiwec,blog,brainfuck,shitpost" />
+        <link rel="stylesheet" href="https://kiwec.net/blog/style.css" />
+        <link rel="alternate" type="application/rss+xml" href="https://kiwec.net/blog/rss.xml">
+    </head>
+    <body>
+        <header>
+            <nav>
+                <h5>
+                    <a href="https://kiwec.net/blog/">blog</a> |
+                    <a href="https://github.com/kiwec/">github</a> |
+                    <a href="https://git.sr.ht/~kiwec/">sourcehut</a>
+                </h5>
+            </nav>
+        </header>
+        <main>
+            
+            <article>
+                <header>
+                    <h1>Beating C with 1 line of Brainfuck</h1>
+                    <ul class="comments"><li><a href="https://lobste.rs/s/fnzx7f"><img src="https://kiwec.net/blog/lob.png" alt="Lobste.rs logo" />Discuss on Lobsters (11 comments)</a></li><li><a href="https://news.ycombinator.com/item?id=21622830"><img src="https://kiwec.net/blog/hn.png" alt="Hacker News logo" />Discuss on Hacker News (86 comments)</a></li></ul>
+                    <h5><a href="https://kiwec.net/blog/tags/brainfuck">#brainfuck</a>, <a href="https://kiwec.net/blog/tags/shitpost">#shitpost</a> - 
+            <time datetime="2019-11-24T14:52:38">
+                November 11, 2019
+            </time>
+            </h5>
+                </header>
+                <p>Following on the recent "<a href="https://chrispenner.ca/posts/wc">faster than wc</a>" blogposts, I decided to end this fad once and for all, using the best language ever created : <strong>Brainfuck</strong>.</p>
+<div class="highlight"><pre><span></span><code><span class="nv">&gt;&gt;</span><span class="nt">,</span><span class="nb">+</span><span class="nv">&gt;&lt;</span><span class="k">[</span><span class="nb">-----------</span><span class="k">[</span><span class="nb">----------------------</span><span class="k">[</span><span class="nv">&gt;</span><span class="nb">+</span><span class="nv">&lt;&lt;</span><span class="nb">-</span><span class="k">[</span><span class="nv">&lt;</span><span class="nb">+</span><span class="nv">&gt;</span><span class="nb">+</span><span class="k">]</span><span class="nv">&gt;</span><span class="k">[</span><span class="nb">-</span><span class="k">]][</span><span class="nb">-</span><span class="k">]]</span><span class="nv">&lt;</span><span class="k">[</span><span class="nb">-</span><span class="k">]</span><span class="nv">&gt;&gt;</span><span class="k">[</span><span class="nv">&lt;&lt;</span><span class="nb">+</span><span class="nv">&gt;&gt;</span><span class="nb">-</span><span class="k">]</span><span class="nv">&lt;</span><span class="nt">,</span><span class="nb">+</span><span class="k">]</span><span class="nv">&lt;</span><span class="k">[</span><span class="nb">-</span><span class="k">]</span><span class="nv">&lt;</span><span class="k">[</span><span class="nv">&gt;&gt;</span><span class="nb">+</span><span class="nv">&gt;</span><span class="nb">+</span><span class="nv">&lt;&lt;&lt;</span><span class="nb">-</span><span class="k">]</span><span class="nv">&gt;&gt;&gt;</span><span class="k">[</span><span class="nv">&lt;&lt;&lt;</span><span class="nb">+</span><span class="nv">&gt;&gt;&gt;</span><span class="nb">-</span><span class="k">]</span><span class="nv">&lt;&lt;</span><span class="nb">+</span><span class="nv">&gt;</span><span class="k">[</span><span class="nv">&lt;</span><span class="nb">-</span><span class="nv">&gt;</span><span class="k">[</span><span class="nv">&gt;</span><span class="nb">++++++++++</span><span class="nv">&lt;</span><span class="k">[</span><span class="nb">-</span><span class="nv">&gt;</span><span class="nb">-</span><span class="k">[</span><span class="nv">&gt;</span><span class="nb">+</span><span class="nv">&gt;&gt;</span><span class="k">]</span><span class="nv">&gt;</span><span class="k">[</span><span class="nb">+</span><span class="k">[</span><span class="nb">-</span><span class="nv">&lt;</span><span class="nb">+</span><span class="nv">&gt;</span><span class="k">]</span><span class="nv">&gt;</span><span class="nb">+</span><span class="nv">&gt;&gt;</span><span class="k">]</span><span class="nv">&lt;&lt;&lt;&lt;&lt;</span><span class="k">]</span><span class="nv">&gt;</span><span class="k">[</span><span class="nb">-</span><span class="k">]</span><span class="nb">++++++++</span><span class="k">[</span><span class="nv">&lt;</span><span class="nb">++++++</span><span class="nv">&gt;</span><span class="nb">-</span><span class="k">]</span><span class="nv">&gt;</span><span class="k">[</span><span class="nv">&lt;&lt;</span><span class="nb">+</span><span class="nv">&gt;&gt;</span><span class="nb">-</span><span class="k">]</span><span class="nv">&gt;</span><span class="k">[</span><span class="nv">&lt;&lt;</span><span class="nb">+</span><span class="nv">&gt;&gt;</span><span class="nb">-</span><span class="k">]</span><span class="nv">&lt;&lt;</span><span class="k">]</span><span class="nv">&gt;</span><span class="k">]</span><span class="nv">&lt;</span><span class="k">[</span><span class="nb">-</span><span class="nv">&gt;&gt;</span><span class="nb">++++++++</span><span class="k">[</span><span class="nv">&lt;</span><span class="nb">++++++</span><span class="nv">&gt;</span><span class="nb">-</span><span class="k">]]</span><span class="nv">&lt;</span><span class="k">[</span><span class="nt">.</span><span class="k">[</span><span class="nb">-</span><span class="k">]</span><span class="nv">&lt;</span><span class="k">]</span><span class="nv">&gt;</span><span class="nb">++++++++++</span><span class="nt">.</span><span class="c"></span>
+</code></pre></div>
+
+
+<p>Well, obviously, that's not very readable. We just needed to put that in for the sweet clickbait ;)</p>
+<p>Here is the actual code :</p>
+<div class="highlight"><pre><span></span><code><span class="c">VARIABLES (in cell order) :</span>
+<span class="c">    total = 0</span>
+<span class="c">  </span><span class="nv">&gt;</span><span class="c"> was_letter = 0</span>
+<span class="c">  </span><span class="nv">&gt;</span><span class="c"> input </span><span class="nt">,</span><span class="nb">+</span><span class="c"></span>
+<span class="c">  </span><span class="nv">&gt;</span><span class="c"> tmp0</span>
+
+<span class="c">while the input isn&#39;t EOF : we count words </span><span class="nv">&lt;</span><span class="k">[</span><span class="nb">-</span><span class="c"></span>
+<span class="c">  </span><span class="nb">----------</span><span class="c"> if input is not a newline </span><span class="k">[</span><span class="c"></span>
+<span class="c">    </span><span class="nb">----------------------</span><span class="c"> if input is not a space </span><span class="k">[</span><span class="c"></span>
+<span class="c">      </span><span class="nv">&gt;</span><span class="nb">+</span><span class="c">         tmp0 = 1</span>
+<span class="c">      </span><span class="nv">&lt;&lt;</span><span class="nb">-</span><span class="k">[</span><span class="nv">&lt;</span><span class="nb">+</span><span class="nv">&gt;</span><span class="nb">+</span><span class="k">]</span><span class="nv">&gt;</span><span class="c"> if not was_letter increment total</span>
+<span class="c">    </span><span class="k">[</span><span class="nb">-</span><span class="k">]]</span><span class="c"></span>
+<span class="c">  </span><span class="k">[</span><span class="nb">-</span><span class="k">]]</span><span class="c"></span>
+
+<span class="c">  </span><span class="nv">&lt;</span><span class="k">[</span><span class="nb">-</span><span class="k">]</span><span class="c">       clear was_letter</span>
+<span class="c">  </span><span class="nv">&gt;&gt;</span><span class="k">[</span><span class="nv">&lt;&lt;</span><span class="nb">+</span><span class="nv">&gt;&gt;</span><span class="nb">-</span><span class="k">]</span><span class="c"> move tmp0 to was_letter</span>
+
+<span class="c">  </span><span class="nv">&lt;</span><span class="nt">,</span><span class="c"> take input again</span>
+<span class="nb">+</span><span class="k">]</span><span class="c"></span>
+
+<span class="nv">&lt;</span><span class="k">[</span><span class="nb">-</span><span class="k">]</span><span class="nv">&lt;</span><span class="c"></span>
+
+<span class="c">print the total (nothing new)</span>
+<span class="k">[</span><span class="nv">&gt;&gt;</span><span class="nb">+</span><span class="nv">&gt;</span><span class="nb">+</span><span class="nv">&lt;&lt;&lt;</span><span class="nb">-</span><span class="k">]</span><span class="nv">&gt;&gt;&gt;</span><span class="k">[</span><span class="nv">&lt;&lt;&lt;</span><span class="nb">+</span><span class="nv">&gt;&gt;&gt;</span><span class="nb">-</span><span class="k">]</span><span class="nv">&lt;&lt;</span><span class="nb">+</span><span class="nv">&gt;</span><span class="k">[</span><span class="nv">&lt;</span><span class="nb">-</span><span class="nv">&gt;</span><span class="k">[</span><span class="nv">&gt;</span><span class="nb">++++++++++</span><span class="nv">&lt;</span><span class="k">[</span><span class="nb">-</span><span class="nv">&gt;</span><span class="nb">-</span><span class="k">[</span><span class="nv">&gt;</span><span class="nb">+</span><span class="nv">&gt;&gt;</span><span class="k">]</span><span class="nv">&gt;</span><span class="k">[</span><span class="nb">+</span><span class="k">[</span><span class="nb">-</span><span class="nv">&lt;</span><span class="nb">+</span><span class="nv">&gt;</span><span class="k">]</span><span class="nv">&gt;</span><span class="nb">+</span><span class="nv">&gt;</span><span class="k">]</span><span class="nv">&lt;&lt;&lt;&lt;&lt;</span><span class="k">]</span><span class="nv">&gt;</span><span class="k">[</span><span class="nb">-</span><span class="k">]</span><span class="nb">++++++++</span><span class="k">[</span><span class="nv">&lt;</span><span class="nb">++++++</span><span class="nv">&gt;</span><span class="nb">-</span><span class="k">]</span><span class="nv">&gt;</span><span class="k">[</span><span class="nv">&lt;&lt;</span><span class="nb">+</span><span class="nv">&gt;&gt;</span><span class="nb">-</span><span class="k">]</span><span class="nv">&gt;</span><span class="k">[</span><span class="nv">&lt;&lt;</span><span class="nb">+</span><span class="nv">&gt;&gt;</span><span class="nb">-</span><span class="k">]</span><span class="nv">&lt;&lt;</span><span class="k">]</span><span class="nv">&gt;</span><span class="k">]</span><span class="nv">&lt;</span><span class="k">[</span><span class="nb">-</span><span class="nv">&gt;&gt;</span><span class="nb">++++++++</span><span class="k">[</span><span class="nv">&lt;</span><span class="nb">++++++</span><span class="nv">&gt;</span><span class="nb">-</span><span class="k">]]</span><span class="nv">&lt;</span><span class="k">[</span><span class="nt">.</span><span class="k">[</span><span class="nb">-</span><span class="k">]</span><span class="nv">&lt;</span><span class="k">]</span><span class="c"></span>
+<span class="nv">&gt;</span><span class="nb">++++++++++</span><span class="nt">.</span><span class="c"></span>
+</code></pre></div>
+
+
+<p>To get the maximum performance out of it, I choose to use <a href="https://github.com/zesterer/funkicrab">funkicrab</a>, which totally doesn't compile to C (I used clang with <code>-O3</code>, if you are wondering). Since cells need to be 32-bit for counting more than 255 words, you'll also need to replace the few occurrences of <code>char</code> to <code>int</code>.</p>
+<p>So, how fast can it run ?</p>
+<div class="highlight"><pre><span></span><code>$ cat words.txt | time wc -w
+13018291
+0.52 user
+0.01 system
+0:00.55 elapsed
+
+$ cat words.txt | time ./bfwc
+13018291
+0.50 user
+0.02 system
+0:00.54 elapsed
+</code></pre></div>
+
+
+<p>Looks like we won a hundredth of a second counting the number of words in a 85 Megabyte file. Which I do all day, every day, so I'm now relaxing by thinking about all the free time I gained.</p>
+<p>Wait, of course not, this was a complete waste of time. Hope you enjoyed it nonetheless :)</p>
+            </article>
+            
+        </main>
+        <footer>
+            <a rel="alternate" type="application/rss+xml" href="https://kiwec.net/blog/rss.xml">
+                Subscribe
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                >
+                    <path
+                        d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-12.832 20c-1.197 0-2.168-.969-2.168-2.165s.971-2.165 2.168-2.165 2.167.969 2.167 2.165-.97 2.165-2.167 2.165zm5.18 0c-.041-4.029-3.314-7.298-7.348-7.339v-3.207c5.814.041 10.518 4.739 10.561 10.546h-3.213zm5.441 0c-.021-7.063-5.736-12.761-12.789-12.792v-3.208c8.83.031 15.98 7.179 16 16h-3.211z"
+                    />
+                </svg>
+            </a>
+        </footer>
+    </body>
+</html>
